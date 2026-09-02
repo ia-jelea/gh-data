@@ -36,13 +36,20 @@ jobs:
         uses: actions/upload-artifact@v4
         with: 
           name: dist-files
+          path: ./01 Starting Project/dist 
           # multiple paths and files to be stored, though not necessary in this case 
-          path: |
-            ./01 Starting Project/dist
-            ./01 Starting Project/package.json
+          # path: |
+          #   ./01 Starting Project/dist
+          #   ./01 Starting Project/package.json
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Get build artifacts
+        uses: actions/downlaod-artifacts@v4
+        with:
+          name: dist-files
+      - name: Output contents 
+        run: ls
       - name: Deploy
         run: echo "Deploying..."
