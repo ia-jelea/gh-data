@@ -12,6 +12,16 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v3
+      # this stores it in a GitHub folder 
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm 
+          # this is used to retrieve it but also when it is discarded - needs a dynamic element 
+          # the specified folder is where dependencies and versions of this project are stored
+          # whenever something changes in the file, the hash being produced will not be the same as before 
+          # npm ci command below now uses this folder / if not it installes them 
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json' )}}
       - name: Install dependencies
         run: npm ci
       - name: Lint code
@@ -31,6 +41,13 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v3
+      # uses the same cache as the one intialised above
+      # manages a central cache available across different workflows 
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm 
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json' )}}
       - name: Install dependencies
         run: npm ci
       - name: Build website
