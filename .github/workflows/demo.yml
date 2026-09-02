@@ -6,6 +6,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "./01 Starting Project"
     steps:
       - name: Get code
         uses: actions/checkout@v3
@@ -18,6 +21,9 @@ jobs:
   build:
     needs: test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "./01 Starting Project"
     steps:
       - name: Get code
         uses: actions/checkout@v3
@@ -25,8 +31,20 @@ jobs:
         run: npm ci
       - name: Build website
         run: npm run build
+      - name: Upload artifacts
+        # @v3 is not supported anymore?
+        uses: actions/upload-artifact@v4
+        with: 
+          name: dist-files
+          # multiple paths and files to be stored, though not necessary in this case 
+          path: |
+            ./01 Starting Project/dist
+            ./01 Starting Project/package.json
   deploy:
     needs: build
+    defaults:
+      run:
+        working-directory: "./01 Starting Project"
     runs-on: ubuntu-latest
     steps:
       - name: Deploy
