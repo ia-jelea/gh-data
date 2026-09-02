@@ -42,9 +42,6 @@ jobs:
             ./01 Starting Project/package.json
   deploy:
     needs: build
-    defaults:
-      run:
-        working-directory: "./01 Starting Project"
     runs-on: ubuntu-latest
     steps:
       - name: Deploy
