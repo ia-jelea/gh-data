@@ -24,6 +24,10 @@ jobs:
     defaults:
       run:
         working-directory: "./01 Starting Project"
+    outputs:
+      # accesses the steps context value, directing towards the variable we're interested in steps.<id-given>.outputs.<filename('filename={}')>
+      # output for the overall job 
+      script-file: ${{ steps.publish.outputs.script-file }}
     steps:
       - name: Get code
         uses: actions/checkout@v3
@@ -31,6 +35,12 @@ jobs:
         run: npm ci
       - name: Build website
         run: npm run build
+      # this does not automatically make the 'variable' (name code) available
+      # we write the output from the name of output file (script-file) into a special file created in the environment where the job runs, where the output key value pair resides, stored in this variable (GITHUB_OUTPUT)
+      - name: Publish JS filename
+        id: publish
+        # another syntax type that may be used echo '::set-output name=script-file::{}' ';' - not be supported by GitHub anymore
+        run: find dist/assets/*.js -type f -execdir echo 'script-file={}' >> $GITHUB_OUTPUT ';'
       - name: Upload artifacts
         # @v3 is not supported anymore?
         uses: actions/upload-artifact@v4
@@ -51,5 +61,10 @@ jobs:
           name: dist-files
       - name: Output contents 
         run: ls
+      # to use outputs from other objects / jobs - we use needs bc the build job is already specified there 
+      # passes simple data between jobs 
+      # becomes especially important once we start building custom actions
+      - name: Output filename
+        run: echo "${{ needs.build.outputs.script-file }}"
       - name: Deploy
         run: echo "Deploying..."
